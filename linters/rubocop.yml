@@ -1,31 +1,31 @@
 AllCops:
   Exclude:
-  - .git/**/*
-  - db/schema.rb
-  - node_modules/**/*
+    - .git/**/*
+    - db/schema.rb
+    - node_modules/**/*
 
 Layout/SpaceInsideHashLiteralBraces:
   Enabled: false
 
 Metrics/AbcSize:
   Exclude:
-  - db/migrate/*
+    - db/migrate/*
 
 Metrics/BlockLength:
   Exclude:
-  - config/environments/*
-  - config/initializers/devise.rb
-  - db/migrate/*
+    - config/environments/*
+    - config/initializers/devise.rb
+    - db/migrate/*
 
 Metrics/LineLength:
   Exclude:
-  - config/initializers/devise.rb
-  - db/migrate/*
+    - config/initializers/devise.rb
+    - db/migrate/*
   Max: 120
 
 Metrics/MethodLength:
   Exclude:
-  - db/migrate/*
+    - db/migrate/*
 
 Security/YAMLLoad:
   Enabled: false
@@ -41,5 +41,5 @@ Style/EmptyMethod:
 
 Style/MixinUsage:
   Exclude:
-  - bin/setup
-  - bin/update
+    - bin/setup
+    - bin/update
