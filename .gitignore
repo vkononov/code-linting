@@ -1,0 +1,14 @@
+# Windows Explorer artifacts
+*thumbs.db
+
+# Mac Finder artifacts
+.DS_Store
+
+# Vim artifacts
+**.swp
+
+# Jetbrains artifacts
+.idea
+
+# Tilde files are usually backup files from a text editor
+*~
