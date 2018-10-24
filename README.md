@@ -60,4 +60,4 @@ Where available, the script will try to auto-correct errors. **Use with caution.
   
 ## License  
   
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+The project is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
