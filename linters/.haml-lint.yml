@@ -1,0 +1,6 @@
+linters:
+  AltText:
+    enabled: true
+
+  LineLength:
+    enabled: false

@@ -1,11 +1,18 @@
 #!/usr/bin/env bash
 
-LINTERS=("ruby" "rails")
+LINTERS=('haml' 'ruby' 'rails')
 
-RUBOCOP_LINK='https://gitlab.com/tactica/code-linting/raw/master/linters/rubocop.yml'
+RAW_URL='https://raw.githubusercontent.com/vkononov/code-linting/master/linters'
+
 RUBOCOP_CONF='.rubocop.yml'
+RUBOCOP_LINK="$RAW_URL/$RUBOCOP_CONF"
 RUBOCOP_PATH=$(pwd)
 RUBOCOP_ARGS='--auto-correct'
+
+HAML_CONF='.haml-lint.yml'
+HAML_LINK="$RAW_URL/$HAML_CONF"
+HAML_PATH=$(pwd)
+HAML_ARGS=''
 
 valid=true
 
@@ -52,6 +59,29 @@ lint_ruby_or_rails() {
 	bundle exec rubocop ${RUBOCOP_ARGS} || { valid=false; }
 }
 
+lint_haml() {
+	status '== Linting HAML =='
+
+	if ! gem query -i -n haml-lint > /dev/null; then
+		status "Installing haml-lint"
+		gem install haml-lint --no-ri --no-rdoc
+	fi
+
+	status "Looking for local $HAML_CONF in $HAML_PATH"
+	if test -e "$HAML_PATH/$HAML_CONF"; then
+		echo "Found $HAML_CONF in $HAML_PATH"
+		status "Linting HAML with $HAML_PATH/$HAML_CONF"
+	else
+		echo "Local $HAML_CONF not found in $HAML_PATH, using default"
+		status "Linting HAML with $HAML_LINK"
+		curl -o "/tmp/$HAML_CONF" ${HAML_LINK}
+		HAML_ARGS="$HAML_ARGS --config /tmp/$HAML_CONF"
+	fi
+
+	warning "Running <bundle exec haml-lint $HAML_ARGS>"
+	bundle exec haml-lint ${HAML_ARGS} || { valid=false; }
+}
+
 abort() {
 	error "$1"; exit 1
 }
@@ -76,6 +106,10 @@ validate_args "$@"
 
 if [[ ! -z $(printf '%s\n' "$@" | grep -w 'ruby\|rails') ]]; then
     lint_ruby_or_rails "$@"
+fi
+
+if [[ ! -z $(printf '%s\n' "$@" | grep -w 'haml') ]]; then
+    lint_haml
 fi
 
 echo
