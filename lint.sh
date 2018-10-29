@@ -1,18 +1,29 @@
 #!/usr/bin/env bash
 
-LINTERS=('haml' 'ruby' 'rails')
+LINTERS=('haml' 'ruby' 'rails' 'sass', 'scss')
 
 RAW_URL='https://raw.githubusercontent.com/vkononov/code-linting/master/linters'
 
+HAML_EXEC='haml-lint'
+HAML_CONF='.haml-lint.yml'
+HAML_LINK="$RAW_URL/$HAML_CONF"
+HAML_PATH=$(pwd)
+HAML_ARGS=''
+
+RUBOCOP_EXEC='rubocop'
 RUBOCOP_CONF='.rubocop.yml'
 RUBOCOP_LINK="$RAW_URL/$RUBOCOP_CONF"
 RUBOCOP_PATH=$(pwd)
 RUBOCOP_ARGS='--auto-correct'
 
-HAML_CONF='.haml-lint.yml'
-HAML_LINK="$RAW_URL/$HAML_CONF"
-HAML_PATH=$(pwd)
-HAML_ARGS=''
+SASS_EXEC='sass-lint'
+SASS_CONF='.sass-lint.yml'
+SASS_LINK="$RAW_URL/$SASS_CONF"
+SASS_PATH=$(pwd)
+SASS_ARGS='--no-exit --verbose'
+
+NODE_BIN_PATH='node_modules/.bin'
+TMP_PATH="/tmp/${PWD##*/}"
 
 valid=true
 
@@ -27,17 +38,40 @@ validate_args() {
 	done
 }
 
+lint_haml() {
+	header 'Linting HAML'
+
+	if ! gem query -i -n ${HAML_EXEC} > /dev/null; then
+		status "Installing $HAML_EXEC"
+		gem install ${HAML_EXEC} --no-ri --no-rdoc
+	fi
+
+	status "Looking for local $HAML_CONF in $HAML_PATH"
+	if test -e "$HAML_PATH/$HAML_CONF"; then
+		echo "Found $HAML_CONF in $HAML_PATH"
+		status "Linting ruby/rails with $HAML_PATH/$HAML_CONF"
+	else
+		echo "Local $HAML_CONF not found in $HAML_PATH, using default"
+		status "Linting HAML with $HAML_LINK"
+		curl -o "$TMP_PATH@$HAML_CONF" ${HAML_LINK}
+		HAML_ARGS="$HAML_ARGS --config $TMP_PATH@$HAML_CONF"
+	fi
+
+	command="bundle exec $HAML_EXEC $HAML_ARGS"
+	warning "Running <$command>"
+	eval ${command} || { valid=false; }
+}
+
 lint_ruby_or_rails() {
-	echo
-	status '== Linting Ruby/Rails =='
+	header 'Linting Ruby/Rails'
 
     if ! type -P node > /dev/null; then
     	abort 'ruby is not installed'
 	fi
 
-	if ! gem query -i -n rubocop > /dev/null; then
-		status "Installing Rubocop"
-		gem install rubocop --no-ri --no-rdoc
+	if ! gem query -i -n ${RUBOCOP_EXEC} > /dev/null; then
+		status "Installing $RUBOCOP_EXEC"
+		gem install ${RUBOCOP_EXEC} --no-ri --no-rdoc
 	fi
 
 	if [[ ! -z $(printf '%s\n' "$@" | grep -w 'rails') ]]; then
@@ -47,39 +81,49 @@ lint_ruby_or_rails() {
 	status "Looking for local $RUBOCOP_CONF in $RUBOCOP_PATH"
 	if test -e "$RUBOCOP_PATH/$RUBOCOP_CONF"; then
 		echo "Found $RUBOCOP_CONF in $RUBOCOP_PATH"
-		status "Linting ruby with $RUBOCOP_PATH/$RUBOCOP_CONF"
+		status "Linting ruby/rails with $RUBOCOP_PATH/$RUBOCOP_CONF"
 	else
 		echo "Local $RUBOCOP_CONF not found in $RUBOCOP_PATH, using default"
-		status "Linting ruby with $RUBOCOP_LINK"
-		curl -o "/tmp/$RUBOCOP_CONF" ${RUBOCOP_LINK}
-		RUBOCOP_ARGS="$RUBOCOP_ARGS --config /tmp/$RUBOCOP_CONF"
+		status "Linting ruby/rails with $RUBOCOP_LINK"
+		curl -o "$TMP_PATH@$RUBOCOP_CONF" ${RUBOCOP_LINK}
+		RUBOCOP_ARGS="$RUBOCOP_ARGS --config $TMP_PATH@$RUBOCOP_CONF"
 	fi
 
-	warning "Running <bundle exec rubocop $RUBOCOP_ARGS>"
-	bundle exec rubocop ${RUBOCOP_ARGS} || { valid=false; }
+	command="bundle exec $RUBOCOP_EXEC $RUBOCOP_ARGS"
+	warning "Running <$command>"
+	eval ${command} || { valid=false; }
 }
 
-lint_haml() {
-	status '== Linting HAML =='
+lint_sass_or_scss() {
+    header 'Linting SASS/SCSS'
 
-	if ! gem query -i -n haml-lint > /dev/null; then
-		status "Installing haml-lint"
-		gem install haml-lint --no-ri --no-rdoc
+    abort_if_node_js_is_missing
+
+    if ! test "$NODE_BIN_PATH/$SASS_EXEC"; then
+		status "Installing $SASS_EXEC"
+		npm install ${SASS_EXEC}
 	fi
 
-	status "Looking for local $HAML_CONF in $HAML_PATH"
-	if test -e "$HAML_PATH/$HAML_CONF"; then
-		echo "Found $HAML_CONF in $HAML_PATH"
-		status "Linting HAML with $HAML_PATH/$HAML_CONF"
+	status "Looking for local $SASS_CONF in $SASS_PATH"
+	if test -e "$SASS_PATH/$SASS_CONF"; then
+		echo "Found $SASS_CONF in $SASS_PATH"
+		status "Linting SASS/SCSS with $SASS_PATH/$SASS_CONF"
 	else
-		echo "Local $HAML_CONF not found in $HAML_PATH, using default"
-		status "Linting HAML with $HAML_LINK"
-		curl -o "/tmp/$HAML_CONF" ${HAML_LINK}
-		HAML_ARGS="$HAML_ARGS --config /tmp/$HAML_CONF"
+		echo "Local $SASS_CONF not found in $SASS_PATH, using default"
+		status "Linting SASS/SCSS with $SASS_LINK"
+		curl -o "$TMP_PATH@$SASS_CONF" ${SASS_LINK}
+		SASS_ARGS="$SASS_ARGS --config $TMP_PATH@$SASS_CONF"
 	fi
 
-	warning "Running <bundle exec haml-lint $HAML_ARGS>"
-	bundle exec haml-lint ${HAML_ARGS} || { valid=false; }
+	command="$NODE_BIN_PATH/$SASS_EXEC $SASS_ARGS"
+	warning "Running <$command>"
+	eval ${command} || { valid=false; }
+}
+
+abort_if_node_js_is_missing() {
+    if ! type -P node > /dev/null; then
+        abort 'NodeJS is not installed'
+    fi
 }
 
 abort() {
@@ -90,16 +134,20 @@ error() {
 	tput setaf 1; echo "ERROR: $1"; tput sgr0
 }
 
-warning() {
-	tput setaf 3; echo "$1"; tput sgr0
-}
-
 success() {
 	tput setaf 2; echo "SUCCESS: $1"; tput sgr0
 }
 
+warning() {
+	tput setaf 3; echo "$1"; tput sgr0
+}
+
 status() {
 	tput setaf 4; echo "$1..."; tput sgr0
+}
+
+header() {
+	tput setaf 5; tput bold; echo; echo "===== $1 ====="; tput sgr0
 }
 
 validate_args "$@"
@@ -110,6 +158,10 @@ fi
 
 if [[ ! -z $(printf '%s\n' "$@" | grep -w 'haml') ]]; then
     lint_haml
+fi
+
+if [[ ! -z $(printf '%s\n' "$@" | grep -w 'sass\|scss') ]]; then
+    lint_sass_or_scss
 fi
 
 echo
