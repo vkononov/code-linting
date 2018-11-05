@@ -184,12 +184,16 @@ header() {
 
 validate_args "$@"
 
-if [[ ! -z $(printf '%s\n' "$@" | grep -w 'ruby\|rails') ]]; then
-    lint_ruby_or_rails "$@"
+if [[ ! -z $(printf '%s\n' "$@" | grep -w 'haml') ]]; then
+    lint_coffee_script
 fi
 
 if [[ ! -z $(printf '%s\n' "$@" | grep -w 'haml') ]]; then
     lint_haml
+fi
+
+if [[ ! -z $(printf '%s\n' "$@" | grep -w 'ruby\|rails') ]]; then
+    lint_ruby_or_rails "$@"
 fi
 
 if [[ ! -z $(printf '%s\n' "$@" | grep -w 'sass\|scss') ]]; then
