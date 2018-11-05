@@ -1,8 +1,14 @@
 #!/usr/bin/env bash
 
-LINTERS=('haml' 'ruby' 'rails' 'sass', 'scss')
+LINTERS=('coffee' 'haml' 'ruby' 'rails' 'sass', 'scss')
 
 RAW_URL='https://raw.githubusercontent.com/vkononov/code-linting/master/linters'
+
+COFFEE_EXEC='coffeelint'
+COFFEE_CONF='coffeelint.json'
+COFFEE_LINK="$RAW_URL/$COFFEE_CONF"
+COFFEE_PATH=$(pwd)
+COFFEE_ARGS=''
 
 HAML_EXEC='haml-lint'
 HAML_CONF='.haml-lint.yml'
@@ -36,6 +42,32 @@ validate_args() {
 	  		exit 1
 		fi
 	done
+}
+
+lint_coffee_script() {
+    header 'Linting CoffeeScript'
+
+    abort_if_node_js_is_missing
+
+    if ! test "$NODE_BIN_PATH/$COFFEE_EXEC"; then
+		status "Installing $COFFEE_EXEC"
+		npm install ${COFFEE_EXEC}
+	fi
+
+	status "Looking for local $COFFEE_CONF in $COFFEE_PATH"
+	if test -e "$COFFEE_PATH/$COFFEE_CONF"; then
+		echo "Found $COFFEE_CONF in $COFFEE_PATH"
+		status "Linting CoffeeScript with $COFFEE_PATH/$COFFEE_CONF"
+	else
+		echo "Local $COFFEE_CONF not found in $COFFEE_PATH, using default"
+		status "Linting CoffeeScript with $COFFEE_LINK"
+		curl -o "$TMP_PATH@$COFFEE_CONF" ${COFFEE_LINK}
+		COFFEE_ARGS="$COFFEE_ARGS --config $TMP_PATH@$COFFEE_CONF"
+	fi
+
+	command="$NODE_BIN_PATH/$COFFEE_EXEC $COFFEE_ARGS"
+	warning "Running <$command>"
+	eval ${command} || { valid=false; }
 }
 
 lint_haml() {
