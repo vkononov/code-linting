@@ -3,7 +3,7 @@ options:
 files:
   include: '**/*.s+(a|c)ss'
   ignore:
-  - 'node_modules/**'
+    - 'node_modules/**'
 
 rules:
   attribute-quotes: 2
@@ -28,7 +28,10 @@ rules:
   indentation: 2
   leading-zero: 2
   max-file-line-count: 2
-  max-line-length: 2
+  max-line-length:
+    - 2
+    -
+      length: 120
   mixin-name-format: 2
   mixins-before-declarations: 2
   nesting-depth: 2
