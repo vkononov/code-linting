@@ -30,8 +30,7 @@ rules:
   max-file-line-count: 2
   max-line-length:
     - 2
-    -
-      length: 120
+    - length: 120
   mixin-name-format: 2
   mixins-before-declarations: 2
   nesting-depth: 2

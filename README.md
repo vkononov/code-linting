@@ -29,7 +29,21 @@ Here's what your `lint` file might look like:
 
 ```bash
 #!/usr/bin/env bash
-curl https://code-linting/master/lint.sh | bash -s ruby rails js jsx sass
+curl https://raw.githubusercontent.com/vkononov/code-linting/master/lint.sh | bash -s ruby rails js jsx sass
+```
+
+Or, if you would like to be able to linting without Internet access:
+
+```bash
+#!/usr/bin/env bash
+
+curl -o /tmp/lint.sh  https://raw.githubusercontent.com/vkononov/code-linting/master/lint.sh
+
+if [[ -f /tmp/lint.sh ]]; then
+    sh /tmp/lint.sh ruby rails js jsx sass
+else
+    echo "ERROR: Your internet may be down." && exit 1
+fi
 ```
 
 ## Usage

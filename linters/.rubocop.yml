@@ -10,12 +10,14 @@ Layout/SpaceInsideHashLiteralBraces:
 Metrics/AbcSize:
   Exclude:
     - db/migrate/*
+    - lib/tasks/*
 
 Metrics/BlockLength:
   Exclude:
     - config/environments/*
     - config/initializers/devise.rb
     - db/migrate/*
+    - lib/tasks/*
 
 Metrics/LineLength:
   Exclude:
@@ -26,6 +28,32 @@ Metrics/LineLength:
 Metrics/MethodLength:
   Exclude:
     - db/migrate/*
+    - lib/tasks/*
+  Max: 12
+
+Rails/BulkChangeTable:
+  Enabled: false
+
+Rails/CreateTableWithTimestamps:
+  Enabled: false
+
+Rails/HasAndBelongsToMany:
+  Enabled: false
+
+Rails/NotNullColumn:
+  Enabled: false
+
+Rails/ReversibleMigration:
+  Enabled: false
+
+Rails/LexicallyScopedActionFilter:
+  Enabled: false
+
+Rails/SkipsModelValidations:
+  Enabled: false
+
+Rails/UnknownEnv:
+  Environments: [development, test, staging, production]
 
 Security/YAMLLoad:
   Enabled: false
