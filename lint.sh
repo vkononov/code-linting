@@ -112,7 +112,7 @@ lint_haml() {
 lint_ruby_or_rails() {
 	header 'Linting Ruby/Rails'
 
-    if ! type -P node > /dev/null; then
+    if ! type -P ruby > /dev/null; then
     	abort 'ruby is not installed'
 	fi
 
@@ -220,5 +220,5 @@ echo
 if ${valid}; then
 	success 'All linters have completed without errors.'
 else
-	abort 'Some linters have completed with errors'
+	abort 'Some linters have completed with errors.'
 fi
