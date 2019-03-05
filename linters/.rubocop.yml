@@ -49,6 +49,10 @@ Rails/ReversibleMigration:
 Rails/LexicallyScopedActionFilter:
   Enabled: false
 
+Rails/OutputSafety:
+  Exclude:
+    - config/initializers/client_side_validations.rb
+
 Rails/SkipsModelValidations:
   Enabled: false
 
